@@ -16,11 +16,13 @@ java -Xmx512m\
 ```
 ### ImageJ plugin
 To install the plugin simply copy it into ImageJ's plugin directory in a subfolder named ```flowig```.
-Before the first run you must compile it by via ```Plugins -> Compile and run ...```
+Before the first run you must compile it by via ```Plugins -> Compile and Run...```
 
 ## Development
 ### Netbeans
-flowig can be run as a standalone application (mostly for development/debugging purposes. To set this up, simple instructions for netbeans are provided.
+flowig can be run as a standalone application (mostly for development/debugging purposes). 
+
+To set this up, simple instructions for netbeans are provided.
 
 - Create a new java project from existing sources
 - Select ```src``` as source directory
