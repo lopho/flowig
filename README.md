@@ -24,5 +24,5 @@ flowig can be run as a standalone application (mostly for development/debugging 
 
 - Create a new java project from existing sources
 - Select ```src``` as source directory
-- Add ```javacpp.jar```, ```javacv.jar```, ```opencv.jav``` and ```opencv-PLATFORM.jar``` (e.g. ```opencv-linux-x86_64.jar```) to the project's libraries
+- Add ```ij.jar``` (either from an ImageJ distribution, or you can build it yourself), ```javacpp.jar```, ```javacv.jar```, ```opencv.jav``` and ```opencv-PLATFORM.jar``` (e.g. ```opencv-linux-x86_64.jar```) to the project's libraries
 - When running the project, select ```flowig.Flowig``` as main class
