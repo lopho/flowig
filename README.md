@@ -17,3 +17,12 @@ java -Xmx512m\
 ### ImageJ plugin
 To install the plugin simply copy it into ImageJ's plugin directory in a subfolder named ```flowig```.
 Before the first run you must compile it by via ```Plugins -> Compile and run ...```
+
+## Development
+### Netbeans
+flowig can be run as a standalone application (mostly for development/debugging purposes. To set this up, simple instructions for netbeans are provided.
+
+- Create a new java project from existing sources
+- Select ```src``` as source directory
+- Add ```javacpp.jar```, ```javacv.jar```, ```opencv.jav``` and ```opencv-PLATFORM.jar``` (e.g. ```opencv-linux-x86_64.jar```) to the project's libraries
+- When running the project, select ```flowig.Flowig``` as main class
