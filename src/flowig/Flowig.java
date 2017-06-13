@@ -57,6 +57,7 @@ public class Flowig implements PlugIn {
         DirectoryChooser dirChooser =
                 new DirectoryChooser("Choose directory with images");
         final String dataPath = dirChooser.getDirectory();
+        if (null == dataPath) return;
 	
         ArrayList<String> paths = new ArrayList<>();
         ArrayList<ImagePlus> images = new ArrayList<>();
