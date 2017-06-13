@@ -41,7 +41,6 @@ public class Flowig implements PlugIn {
 
 //############################################################################
 // constants
-//    static final String DATA_PATH = "/home/zweistecken/workspace/studium/dbv/projekt/data";
     static final int BOUNDS_COLOR = 0xff_ff_00_ff;
     static final int SCALE_SIZE = 0;
     static final int SCALE_COLOR = 1;
