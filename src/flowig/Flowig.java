@@ -14,7 +14,6 @@ import ij.plugin.PlugIn;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
-import ij.process.ColorProcessor;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
@@ -46,11 +45,18 @@ public class Flowig implements PlugIn {
     static final int SCALE_COLOR = 1;
 
 //############################################################################
-// main
-	public void run(String arg) {
-	    DirectoryChooser dirChooser =
-        	    new DirectoryChooser("Choose directory with images");
-	    final String dataPath = dirChooser.getDirectory();
+// main (for debugging purposes only)
+    public static void main(String[] args) {
+        Flowig flowig = new Flowig();
+        flowig.run("");
+    }
+    
+//############################################################################
+// plugin (run)
+    public void run(String arg) {
+        DirectoryChooser dirChooser =
+                new DirectoryChooser("Choose directory with images");
+        final String dataPath = dirChooser.getDirectory();
 	
         ArrayList<String> paths = new ArrayList<>();
         ArrayList<ImagePlus> images = new ArrayList<>();
