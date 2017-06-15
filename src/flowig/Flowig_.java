@@ -292,8 +292,8 @@ public class Flowig_ implements PlugIn {
      * @return True on correct arguments else false
      */
     private boolean checkArguments(String arg) {
-        
-        String options = arg != null? arg : Macro.getOptions();
+                
+        String options = arg != null && !arg.trim().isEmpty() ? arg : Macro.getOptions();
                         
         if(options == null){
             return false;
