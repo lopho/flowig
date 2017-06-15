@@ -13,6 +13,7 @@ import java.awt.Rectangle;
 import ij.plugin.PlugIn;
 import ij.IJ;
 import ij.ImagePlus;
+import ij.Macro;
 import ij.process.ImageProcessor;
 import ij.gui.Overlay;
 import ij.gui.Roi;
@@ -49,6 +50,11 @@ public class Flowig implements PlugIn {
     static final int SCALE_SIZE = 0;
     // saturation scale factor for flow image visualization
     static final int SCALE_COLOR = 1;
+    
+    static final String ARGUMENT_DIVIDER = ",";
+    
+    private static FlowType flowType = FlowType.DIS;
+    private static String dataDir;
 
 //############################################################################
 // main (for debugging purposes only)
@@ -61,14 +67,19 @@ public class Flowig implements PlugIn {
 // plugin (run)
     @Override
     public void run(String arg) {
-        DirectoryChooser dirChooser =
-                new DirectoryChooser("Choose directory with images");
-        final String dataPath = dirChooser.getDirectory();
-        if (null == dataPath) return;
-	
+                
+        if(!checkArguments()){
+            DirectoryChooser dirChooser
+                    = new DirectoryChooser("Choose directory with images");
+            dataDir = dirChooser.getDirectory();
+            if (null == dataDir) {
+                return;
+            }
+        }
+        
         ArrayList<String> paths = new ArrayList<>();
         ArrayList<ImagePlus> images = new ArrayList<>();
-        File dir = new File(dataPath);
+        File dir = new File(dataDir);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
             for (File child : directoryListing) {
@@ -249,7 +260,7 @@ public class Flowig implements PlugIn {
                 opencv_imgproc.pyrDown(mat0, mat0);
                 opencv_imgproc.pyrDown(mat1, mat1);
             }
-            Mat flow = makeFlow(mat0, mat1, FlowType.DIS);
+            Mat flow = makeFlow(mat0, mat1, flowType);
             Mat flowImg = drawOpticalFlow(flow);
             for (int i = 0; i < SCALE_SIZE; ++i) {
                 opencv_imgproc.pyrUp(flowImg, flowImg);
@@ -266,6 +277,45 @@ public class Flowig implements PlugIn {
             vizImg.close();
         
         return imagesOut;
+    }
+
+    /**
+     * 
+     * @return True on correct arguments else false
+     */
+    private boolean checkArguments() {
+        String options = Macro.getOptions();
+                        
+        if(options == null){
+            return false;
+        }
+        
+        String [] arguments = options.split(ARGUMENT_DIVIDER);
+        
+        for (String s : arguments){
+            
+            String[] values = s.split("=");
+            String name = values[0];
+            String value = values[1];
+            
+            switch (name) {
+                case "path": 
+                    dataDir = value
+                            .trim()
+                            .replace("~", System.getenv("HOME"));
+                    break;
+                case "flow": 
+                    flowType = FlowType.valueOf(value.trim());
+                    break;
+            }
+        }
+        
+        IJ.log("dataDir: " + dataDir);
+        IJ.log("exists? " +new File(dataDir).exists());
+        IJ.log("flowType: " + flowType);
+     
+        
+        return true;
     }
     
 // ######## flow type
