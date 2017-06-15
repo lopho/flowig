@@ -20,6 +20,7 @@ import ij.gui.TextRoi;
 import ij.gui.Arrow;
 import ij.gui.PolygonRoi;
 import ij.io.DirectoryChooser;
+import ij.process.ColorProcessor;
 
 //############################################################################
 // opencv
@@ -80,17 +81,30 @@ public class Flowig implements PlugIn {
             }
         } 
 
-        Overlay o = getBoundsBasedMovement(images);
+        Overlay o = getBoundsBasedMovement(images, false);
+        ArrayList<ImagePlus> flows = getOpticalFlowBasedMovement(images, false);
         
-        for (ImagePlus p : images) {
-           p.setOverlay(o);
-           p.show();
-        }  
+        ImageProcessor vizIp = new ColorProcessor(images.get(0).getWidth(), images.get(0).getHeight());
+        ImagePlus vizFlow = new ImagePlus("flow", vizIp);
+        vizFlow.show();
+        vizFlow.setOverlay(o);
         
-        IJ.wait(2000);
-        for (int j = 0; j < images.size() - 1; ++j) {
-            images.get(j).close();
+        for (int j = 0; j < 10; ++j) {
+            for (int i = 0; i < images.size(); ++i) {
+                vizFlow.setImage(flows.get(i));
+                IJ.wait(1000);
+            }
         }
+        
+//        for (ImagePlus p : images) {
+//           p.setOverlay(o);
+//           p.show();
+//        }  
+//        
+//        IJ.wait(2000);
+//        for (int j = 0; j < images.size() - 1; ++j) {
+//            images.get(j).close();
+//        }
         
         System.out.println("==========================");
     }
@@ -102,11 +116,25 @@ public class Flowig implements PlugIn {
 //############################################################################    
 //############################################################################
 // ######## draw movement vectors for all images into overlay
-    static public Overlay getBoundsBasedMovement(ArrayList<ImagePlus> images) {
+    static public Overlay getBoundsBasedMovement(ArrayList<ImagePlus> images, boolean viz) {
+        if (images.size() < 2)
+            return new Overlay();
+        
         ArrayList<Vector> centers = new ArrayList<>();
         ArrayList<Rectangle> bounds = new ArrayList<>();
         
+        final int w = images.get(0).getWidth();
+        final int h = images.get(0).getHeight();
+        
+        ImageProcessor vizIp = new ColorProcessor(w, h);
+        ImagePlus vizImg = new ImagePlus("movement", vizIp);
+        
         Overlay o = new Overlay();
+        
+        if (viz) {
+            vizImg.setOverlay(o);
+            vizImg.show();
+        }
         
         int i = 0;
         for (ImagePlus img : images) {
@@ -139,8 +167,14 @@ public class Flowig implements PlugIn {
                 System.out.println("Direction: " + direction);
                 System.out.println("--------");
             }  
-            i++;         
+            i++;
+            
+            if (viz)
+                vizImg.setImage(img);
         }
+        
+        if (viz)
+            vizImg.close();
         
         return o;
     }
@@ -182,7 +216,52 @@ public class Flowig implements PlugIn {
 //############################################################################    
 // optical flow
 //############################################################################    
-//############################################################################    
+//############################################################################ 
+// ######## compute and vizualize optical flow for all images
+    static public ArrayList<ImagePlus> getOpticalFlowBasedMovement(ArrayList<ImagePlus> images, boolean viz) {
+        ArrayList<ImagePlus> imagesOut = new ArrayList<>();
+        
+        if (images.size() < 2)
+            return imagesOut;
+        
+        
+        
+        ImagePlus img0 = images.get(0);
+        final int w = img0.getWidth();
+        final int h = img0.getHeight();
+        
+        ImageProcessor vizIp = new ColorProcessor(w, h);
+        ImagePlus vizImg = new ImagePlus("flow", vizIp);
+        
+        if (viz)
+            vizImg.show();
+        
+        for (final ImagePlus img1 : images) {
+            Mat mat0 = toMat(img0);
+            Mat mat1 = toMat(img1);
+            for (int i = 0; i < SCALE_SIZE; ++i) {
+                opencv_imgproc.pyrDown(mat0, mat0);
+                opencv_imgproc.pyrDown(mat1, mat1);
+            }
+            Mat flow = makeFlow(mat0, mat1, FlowType.DIS);
+            Mat flowImg = drawOpticalFlow(flow);
+            for (int i = 0; i < SCALE_SIZE; ++i) {
+                opencv_imgproc.pyrUp(flowImg, flowImg);
+            }
+            ImagePlus img = toImagePlus(flowImg);
+            imagesOut.add(img);
+            img0.setImage(img1);
+            
+            if (viz)
+                vizImg.setImage(img);
+        }
+        
+        if (viz)
+            vizImg.close();
+        
+        return imagesOut;
+    }
+    
 // ######## flow type
     static public enum FlowType {
         SparseToDense,
@@ -294,6 +373,9 @@ public class Flowig implements PlugIn {
     }
     
 // ######## visualize entire flow field with colors
+    static public Mat drawOpticalFlow(final Mat flow) {
+        return drawOpticalFlow(flow, -1);
+    }
     static public Mat drawOpticalFlow(final Mat flow, final float maxmotion) {
 //        ImageProcessor ip = new ColorProcessor(flow.cols(), flow.rows());
 //        ImagePlus imp = new ImagePlus("flow", ip);
