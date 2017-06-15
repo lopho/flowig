@@ -18,9 +18,11 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
 import ij.gui.Arrow;
+import ij.gui.ImageRoi;
 import ij.gui.PolygonRoi;
 import ij.io.DirectoryChooser;
 import ij.process.ColorProcessor;
+import java.awt.Composite;
 
 //############################################################################
 // opencv
@@ -57,6 +59,7 @@ public class Flowig implements PlugIn {
     
 //############################################################################
 // plugin (run)
+    @Override
     public void run(String arg) {
         DirectoryChooser dirChooser =
                 new DirectoryChooser("Choose directory with images");
@@ -73,40 +76,41 @@ public class Flowig implements PlugIn {
                     continue;
                 }
                 paths.add(child.getAbsolutePath());
-
+            }
+            if (paths.size() < 2) {
+                IJ.error("Not enough images: please select a folder with two or more images");
+                System.exit(1);
             }
             Collections.sort(paths, String::compareTo);
             for (String s : paths) {
                 images.add(new ImagePlus(s));
             }
         } 
-
+        
         Overlay o = getBoundsBasedMovement(images, false);
         ArrayList<ImagePlus> flows = getOpticalFlowBasedMovement(images, false);
         
-        ImageProcessor vizIp = new ColorProcessor(images.get(0).getWidth(), images.get(0).getHeight());
-        ImagePlus vizFlow = new ImagePlus("flow", vizIp);
-        vizFlow.show();
-        vizFlow.setOverlay(o);
+        final int w = images.get(0).getWidth();
+        final int h = images.get(0).getHeight();
+        final Composite comp = BlendComposite.getInstance(BlendComposite.BlendingMode.MULTIPLY);
         
-        for (int j = 0; j < 10; ++j) {
-            for (int i = 0; i < images.size(); ++i) {
-                vizFlow.setImage(flows.get(i));
-                IJ.wait(1000);
-            }
+        ImageRoi imgRoi = new ImageRoi(0, 0, flows.get(0).getProcessor());
+        imgRoi.setComposite(comp);
+        o.add(imgRoi);
+        
+        ImagePlus vizImg = new ImagePlus("flow", images.get(0).getProcessor());
+        vizImg.setImage(images.get(0));
+        vizImg.setOverlay(o);
+        vizImg.show();
+        
+        for (int i = 0; i < images.size(); ++i) {
+            vizImg.setImage(images.get(i));
+            o.remove(imgRoi);
+            imgRoi = new ImageRoi(0, 0, flows.get(i).getProcessor());
+            imgRoi.setComposite(comp);
+            o.add(imgRoi);
+            IJ.wait(1000);
         }
-        
-//        for (ImagePlus p : images) {
-//           p.setOverlay(o);
-//           p.show();
-//        }  
-//        
-//        IJ.wait(2000);
-//        for (int j = 0; j < images.size() - 1; ++j) {
-//            images.get(j).close();
-//        }
-        
-        System.out.println("==========================");
     }
     
    
@@ -172,6 +176,8 @@ public class Flowig implements PlugIn {
             if (viz)
                 vizImg.setImage(img);
         }
+        
+        System.out.println("==========================");
         
         if (viz)
             vizImg.close();
