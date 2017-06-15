@@ -1,0 +1,78 @@
+% Anpassung an Landessprache
+\usepackage[ngerman]{babel}
+
+% Verwenden von Sonderzeichen und Silbentrennung
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp} 																% Euro-Zeichen und andere
+\usepackage[babel,german=quotes]{csquotes}						% Anf�hrungszeichen
+\RequirePackage[ngerman=ngerman-x-latest]{hyphsubst} 	% erweiterte Silbentrennung
+
+%irgendwas font mäßiges
+%\usepackage[libertine,cmintegrals,cmbraces,vvarbb]{newtxmath}
+
+% Befehle aus AMSTeX f�r mathematische Symbole z.B. \boldsymbol \mathbb
+\usepackage{amsmath,amsfonts}
+
+% Zeilenabst�nde und Seitenr�nder
+\usepackage{setspace}
+\usepackage{geometry}
+
+% Einbinden von JPG-Grafiken
+\usepackage{graphicx}
+
+% zum Umflie�en von Bildern
+% Verwendung unter http://de.wikibooks.org/wiki/LaTeX-Kompendium:_Baukastensystem#textumflossene_Bilder
+\usepackage{floatflt}
+
+% Verwendung von vordefinierten Farbnamen zur Colorierung
+% Palette und Verwendung unter http://kitt.cl.uzh.ch/kitt/CLinZ.CH/src/Kurse/archiv/LaTeX-Kurs-Farben.pdf
+\usepackage[usenames,dvipsnames]{color}
+
+% Tabellen
+\usepackage{array}
+\usepackage{longtable}
+
+% einfache Grafiken im Code
+% Einf�hrung unter http://www.math.uni-rostock.de/~dittmer/bsp/pstricks-bsp.pdf
+\usepackage{pstricks}
+
+% Quellcodeansichten
+\usepackage{verbatim}
+\usepackage{moreverb} 											% f�r erweiterte Optionen der verbatim Umgebung
+% Befehle und Beispiele unter http://www.ctex.org/documents/packages/verbatim/moreverb.pdf
+\usepackage{listings} 											% f�r angepasste Quellcodeansichten siehe
+% Kurzeinf�hrung unter http://blog.robert-kummer.de/2006/04/latex-quellcode-listing.html
+
+% Glossar und Abbildungsverzeichnis
+\usepackage[
+nonumberlist, %keine Seitenzahlen anzeigen
+acronym,      %ein Abk�rzungsverzeichnis erstellen
+toc          %Eintr�ge im Inhaltsverzeichnis
+]      %im Inhaltsverzeichnis auf section-Ebene erscheinen
+{glossaries}
+
+% verlinktes und Farblich angepasstes Inhaltsverzeichnis
+\usepackage[pdftex,
+colorlinks=true,
+citecolor=InterneLinkfarbe,
+linkcolor=InterneLinkfarbe,
+urlcolor=ExterneLinkfarbe]{hyperref}
+\usepackage[all]{hypcap}
+
+% URL verlinken, lange URLs umbrechen
+\usepackage{url}
+
+% sorgt daf�r, dass Leerzeichen hinter parameterlosen Makros nicht als Makroendezeichen interpretiert werden
+\usepackage{xspace}
+
+% Beschriftungen f�r Abbildungen und Tabellen
+\usepackage{caption}
+
+% Entwicklerwarnmeldungen entfernen
+\usepackage{scrhack}
+
+%Horizontale Linien in Tabellen
+\usepackage{booktabs}
+
+\usepackage{multirow}

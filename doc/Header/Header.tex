@@ -1,0 +1,76 @@
+%allgemeine Formatangaben
+\documentclass[
+ a4paper, 										% Papierformat
+ 12pt,												% Schriftgr��e
+ ngerman, 										% f�r Umlaute, Silbentrennung etc.
+ titlepage,										% es wird eine Titelseite verwendet
+ bibliography=totoc,					% Literaturverzeichnis im Inhaltsverzeichnis auff�hren
+ listof=totoc,								% Verzeichnisse im Inhaltsverzeichnis auff�hren
+ oneside, 										% einseitiges Dokument
+ captions=nooneline,					% einzeilige Gleitobjekttitel ohne Sonderbehandlung wie mehrzeilige Gleitobjekttitel behandeln
+ numbers=noenddot,						% �berschriften-??Nummerierung ohne Punkt am Ende
+ parskip=half									% zwischen Abs�tzen wird eine halbe Zeile eingef�gt
+ ]{scrbook}
+
+
+\input{Header/Pakete}					% einbinden der verwendeten Latex-Pakete
+\input{Header/Metadaten} 			% einbinden von pers�nlichen Daten
+
+
+\onehalfspacing 							% 1,5facher Zeilenabstand
+
+\definecolor{InterneLinkfarbe}{rgb}{0.1,0.1,0.3} 	% Farbliche Absetzung von externen Links
+\definecolor{ExterneLinkfarbe}{rgb}{0.1,0.1,0.7}	% Farbliche Absetzung von internen Links
+
+% Einstellungen f�r Fu�noten:
+\captionsetup{font=footnotesize,labelfont=sc,singlelinecheck=true,margin={5mm,5mm}}
+
+% Stil der Quellenangabe
+\bibliographystyle{alphadin}
+
+%Ausschluss von Schusterjungen
+\clubpenalty = 10000
+%Ausschluss von Hurenkindern
+\widowpenalty = 10000
+
+% Befehle, die Umlaute ausgeben, f�hren zu Fehlern, wenn sie hyperref als Optionen �bergeben werden
+\hypersetup{
+%    pdftitle={\titel \untertitel},
+%    pdfauthor={\autor},
+%    pdfcreator={\autor},
+%    pdfsubject={\titel \untertitel},
+%    pdfkeywords={\titel \untertitel},
+}
+
+% Beispiel f�r eine Listings-Codeumbebungen
+% Bei mehreren Definitionen empfielt sich das auslagern in eine externe Datei
+\lstloadlanguages{Java,HTML}
+\lstset{
+	frame=tb,
+	framesep=5pt,
+	basicstyle=\footnotesize\ttfamily,
+	showstringspaces=false,
+	keywordstyle=\ttfamily\bfseries\color{CadetBlue},
+	identifierstyle=\ttfamily,
+	stringstyle=\ttfamily\color{OliveGreen},
+	commentstyle=\color{GrayBlue},
+	rulecolor=\color{Gray},
+	xleftmargin=5pt,
+	xrightmargin=5pt,
+	aboveskip=\bigskipamount,
+	belowskip=\bigskipamount
+}
+
+%Den Punkt am Ende jeder Beschreibung deaktivieren
+\renewcommand*{\glspostdescription}{}
+
+%Glossar-Befehle anschalten
+\makenoidxglossaries
+\glsenablehyper
+\input{Header/Abkuerzungen}
+\input{Header/Glossar}
+
+\setcounter{secnumdepth}{4}
+
+%Überschriften weiter oben in Seite beginnen
+\renewcommand*\chapterheadstartvskip{\vspace*{-1cm}}

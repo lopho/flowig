@@ -23,3 +23,12 @@ hs_err_pid*
 /nbproject/private/
 /build/
 /dist/
+*.bbl
+*.blg
+*.dvi
+*.lof
+*.lot
+*.out
+/doc/Arbeit.synctex.gz
+*.toc
+*.aux

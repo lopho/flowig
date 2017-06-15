@@ -28,3 +28,5 @@ To set this up, simple instructions for netbeans are provided.
 - Select ```src``` as source directory
 - Add ```ij.jar``` (either from an ImageJ distribution, or you can build it yourself), ```javacpp.jar```, ```javacv.jar```, ```opencv.jav``` and ```opencv-PLATFORM.jar``` (e.g. ```opencv-linux-x86_64.jar```) to the project's libraries
 - When running the project, select ```flowig.Flowig``` as main class
+
+java -Xmx512m -cp E:\1_Studium\ImageJ\javacv\javacpp.jar -cp E:\1_Studium\ImageJ\javacv\javacv.jar -cp E:\1_Studium\ImageJ\javacv\opencv.jar -cp E:\1_Studium\ImageJ\javacv\opencv-linux-x86_64.jar -jar ij.jar
