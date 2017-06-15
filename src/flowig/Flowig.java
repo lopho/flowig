@@ -51,21 +51,21 @@ public class Flowig implements PlugIn {
     
     static final String ARGUMENT_DIVIDER = ",";
     
-    private static FlowType flowType = FlowType.DIS;
-    private static String dataDir;
+    private FlowType flowType = FlowType.DIS;
+    private String dataDir;
 
 //############################################################################
 // main (for debugging purposes only)
     public static void main(String[] args) {
         Flowig flowig = new Flowig();
-        flowig.run("");
+        flowig.run(null);
     }
     
 //############################################################################
 // plugin (run)
     public void run(String arg) {
                 
-        if(!checkArguments()){
+        if(!checkArguments(arg)){
             DirectoryChooser dirChooser
                     = new DirectoryChooser("Choose directory with images");
             dataDir = dirChooser.getDirectory();
@@ -93,7 +93,7 @@ public class Flowig implements PlugIn {
         } 
 
         Overlay o = getBoundsBasedMovement(images, false);
-        ArrayList<ImagePlus> flows = getOpticalFlowBasedMovement(images, false);
+        ArrayList<ImagePlus> flows = getOpticalFlowBasedMovement(images, false, flowType);
         
         ImageProcessor vizIp = new ColorProcessor(images.get(0).getWidth(), images.get(0).getHeight());
         ImagePlus vizFlow = new ImagePlus("flow", vizIp);
@@ -229,7 +229,7 @@ public class Flowig implements PlugIn {
 //############################################################################    
 //############################################################################ 
 // ######## compute and vizualize optical flow for all images
-    static public ArrayList<ImagePlus> getOpticalFlowBasedMovement(ArrayList<ImagePlus> images, boolean viz) {
+    static public ArrayList<ImagePlus> getOpticalFlowBasedMovement(ArrayList<ImagePlus> images, boolean viz, FlowType flowType) {
         ArrayList<ImagePlus> imagesOut = new ArrayList<>();
         
         if (images.size() < 2)
@@ -277,8 +277,9 @@ public class Flowig implements PlugIn {
      * 
      * @return True on correct arguments else false
      */
-    private boolean checkArguments() {
-        String options = Macro.getOptions();
+    private boolean checkArguments(String arg) {
+        
+        String options = arg != null? arg : Macro.getOptions();
                         
         if(options == null){
             return false;
