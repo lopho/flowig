@@ -40,8 +40,11 @@ public class Flowig implements PlugIn {
 
 //############################################################################
 // constants
-    static final int BOUNDS_COLOR = 0xff_ff_00_ff;
+    // color used for bounding boxes
+    static final int BOUNDS_COLOR = 0xff_ff_00_ff; // magenta
+    // how often should images be downscaled before flow computation
     static final int SCALE_SIZE = 0;
+    // saturation scale factor for flow image visualization
     static final int SCALE_COLOR = 1;
 
 //############################################################################
@@ -77,6 +80,29 @@ public class Flowig implements PlugIn {
             }
         } 
 
+        Overlay o = getBoundsBasedMovement(images);
+        
+        for (ImagePlus p : images) {
+           p.setOverlay(o);
+           p.show();
+        }  
+        
+        IJ.wait(2000);
+        for (int j = 0; j < images.size() - 1; ++j) {
+            images.get(j).close();
+        }
+        
+        System.out.println("==========================");
+    }
+    
+   
+//############################################################################    
+//############################################################################    
+// bounding box based movement estimation
+//############################################################################    
+//############################################################################
+// ######## draw movement vectors for all images into overlay
+    static public Overlay getBoundsBasedMovement(ArrayList<ImagePlus> images) {
         ArrayList<Vector> centers = new ArrayList<>();
         ArrayList<Rectangle> bounds = new ArrayList<>();
         
@@ -116,25 +142,10 @@ public class Flowig implements PlugIn {
             i++;         
         }
         
-        for (ImagePlus p : images) {
-           p.setOverlay(o);
-           p.show();
-        }  
-        
-        IJ.wait(2000);
-        for (int j = 0; j < images.size() - 1; ++j) {
-            images.get(j).close();
-        }
-        
-        System.out.println("==========================");
+        return o;
     }
-    
-    
-//############################################################################    
-//############################################################################    
-// bbox detection
-//############################################################################    
-//############################################################################    
+       
+// ######## bbox detection    
     static public Rectangle getBounds(ImagePlus image, int boundsColor) {
         ImageProcessor ip = image.getProcessor();
         final int w = image.getWidth();
@@ -227,26 +238,26 @@ public class Flowig implements PlugIn {
     static final int BM = 13;
     static final int MR = 6;
     static final int NCOLS = RY + YG + GC + CB + BM + MR;
-    static final Color[] colorWheel = new Color[NCOLS];
+    static final Color[] COLORWHEEL = new Color[NCOLS];
     static {
         int k = 0;
         for (int i = 0; i < RY; ++i, ++k) {
-            colorWheel[k] = new Color(255, 255 * i / RY, 0);
+            COLORWHEEL[k] = new Color(255, 255 * i / RY, 0);
         }
         for (int i = 0; i < YG; ++i, ++k) {
-            colorWheel[k] = new Color(255 - 255 * i / YG, 255, 0);
+            COLORWHEEL[k] = new Color(255 - 255 * i / YG, 255, 0);
         }
         for (int i = 0; i < GC; ++i, ++k) {
-            colorWheel[k] = new Color(0, 255, 255 * i / GC);
+            COLORWHEEL[k] = new Color(0, 255, 255 * i / GC);
         }
         for (int i = 0; i < CB; ++i, ++k) {
-            colorWheel[k] = new Color(0, 255 - 255 * i / CB, 255);
+            COLORWHEEL[k] = new Color(0, 255 - 255 * i / CB, 255);
         }
         for (int i = 0; i < BM; ++i, ++k) {
-            colorWheel[k] = new Color(255 * i / BM, 0, 255);
+            COLORWHEEL[k] = new Color(255 * i / BM, 0, 255);
         }
         for (int i = 0; i < MR; ++i, ++k) {
-            colorWheel[k] = new Color(255, 0, 255 - 255 * i / MR);
+            COLORWHEEL[k] = new Color(255, 0, 255 - 255 * i / MR);
         }
     }
     
@@ -266,8 +277,8 @@ public class Flowig implements PlugIn {
         Color pix = new Color();
 
         for (int b = 0; b < 3; b++) {
-            final float col0 = colorWheel[k0].get(b) / 255.f;
-            final float col1 = colorWheel[k1].get(b) / 255.f;
+            final float col0 = COLORWHEEL[k0].get(b) / 255.f;
+            final float col1 = COLORWHEEL[k1].get(b) / 255.f;
 
             float col = (1 - f) * col0 + f * col1;
 
@@ -325,9 +336,12 @@ public class Flowig implements PlugIn {
         }
         return dst;
     }
-    
+
+//############################################################################    
 //############################################################################
 // Vector
+//############################################################################
+//############################################################################
     static public class Vector {
         double x = 0;
         double y = 0;
@@ -358,8 +372,11 @@ public class Flowig implements PlugIn {
        
     }
     
+//############################################################################
 //############################################################################    
 // Color
+//############################################################################
+//############################################################################
     static public class Color {
 
         public int r = 0;
@@ -407,7 +424,10 @@ public class Flowig implements PlugIn {
     }
     
 //############################################################################
+//############################################################################
 // opencv <-> imagej
+//############################################################################
+//############################################################################
     static public ImagePlus toImagePlus(final Mat mat, final String title) {
         Java2DFrameConverter javaConverter = new Java2DFrameConverter();
         OpenCVFrameConverter.ToMat matConverter = new OpenCVFrameConverter.ToMat();
@@ -428,6 +448,7 @@ public class Flowig implements PlugIn {
         return matConverter.convert(frame);
     }
 
+//############################################################################
 //############################################################################
 
 }
