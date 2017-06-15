@@ -40,7 +40,7 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 
 
 //############################################################################
-public class Flowig implements PlugIn {
+public class Flowig_ implements PlugIn {
 
 //############################################################################
 // constants
@@ -59,7 +59,7 @@ public class Flowig implements PlugIn {
 //############################################################################
 // main (for debugging purposes only)
     public static void main(String[] args) {
-        Flowig flowig = new Flowig();
+        Flowig_ flowig = new Flowig_();
         flowig.run("");
     }
     
