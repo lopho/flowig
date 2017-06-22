@@ -54,7 +54,7 @@ public class Flowig_ implements PlugIn {
 //############################################################################
 // constants
     // color used for bounding boxes
-    private int boundsColor = 0xff_ff_00_ff; // magenta
+    private long boundsColor = 0xff_ff_00_ff; // magenta
     // how often should images be downscaled before flow computation
     private int scaleSize = 0;
     // saturation scale factor for flow image visualization
@@ -112,7 +112,7 @@ public class Flowig_ implements PlugIn {
                     maxMotion = Float.parseFloat(value);
                     break;
                 case "boundscolor":
-                    boundsColor = Integer.decode(value);
+                    boundsColor = Long.decode(value);
                     break;
                 case "scalesize":
                     scaleSize = Integer.parseInt(value);
@@ -284,7 +284,7 @@ public class Flowig_ implements PlugIn {
     }
        
 // ######## bbox detection    
-    static public Rectangle getBounds(ImagePlus image, int boundsColor) {
+    static public Rectangle getBounds(ImagePlus image, long boundsColor) {
         ImageProcessor ip = image.getProcessor();
         final int w = image.getWidth();
         final int h = image.getHeight();
