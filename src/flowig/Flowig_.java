@@ -112,7 +112,7 @@ public class Flowig_ implements PlugIn {
                     maxMotion = Float.parseFloat(value);
                     break;
                 case "boundscolor":
-                    final String[] channels = value.split(" ");
+                    final String[] channels = value.split("\\+");
                     final int r = Integer.parseInt(channels[0]);
                     final int g = Integer.parseInt(channels[1]);
                     final int b = Integer.parseInt(channels[2]);
