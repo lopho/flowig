@@ -9,22 +9,30 @@ Das vorliegende ImageJ-Plugin Flowig dient zur Erkennung der Bewegung eines mark
 \textbf{Ausgabe: } Bewegungsrichtung und Geschwindigkeit des Objekts in jedem Bild
 
 
-\textbf{Anzeige: } Bewegungsrichtungen auf jedem Bild als Overlay, Lucas Kanade?
+\textbf{Anzeige: } Bewegungsrichtungen auf jedem Bild als Overlay und Darstellung des optischen Flusses
 
 \section{Installation}
-Bibliothek JavaCV \footnote{\url{https://github.com/bytedeco/javacv}
+%TODO flowig.java muss in plugins/flowig liegen
+Die Datei \code{Flowig\_.java} muss in einem eigenen Unterordner \code{flowig} in ImageJ's Plugin Ordner liegen.
 
+Flowig nutzt die Bibliothek JavaCV~\footnote{\url{https://github.com/bytedeco/javacv}}. Damit auf die Bibliothek zugegriffen werden kann, müssen zuerst die Dateien \code{javacpp.jar, javacv.jar, opencv.jar} und \code{opencv-linux-x86\_64.jar} in den Ordner \code{ImageJ/plugins/jars} kopiert werden.
+
+Des Weiteren muss die Version des genutzten Plugin-Compilers auf $1.8$ eingestellt sein. 
+Die aktuelle Version lässt sich in ImageJ über folgendes Menü einsehen:\\
+\mbox{\textbf{Edit}~$\rightarrow$~\textbf{Options}~$\rightarrow$~\textbf{Compiler\dots}} 
 
 \section{Nutzung}
 
-In ImageJ muss über das Menü \textbf{File} $\rightarrow$ \textbf{Import} $\rightarrow$ \textbf{Image Sequence$\dots$} eine Bildfolge geöffnet werden. 
+In ImageJ muss über das Menü~\textbf{File}~$\rightarrow$~\textbf{Import}~$\rightarrow$~\textbf{Image Sequence$\dots$} eine Bildfolge geöffnet werden. 
+
+Nachdem das Plugin gestartet wurde, muss ein Ordner gewählt werden, der eine Bildfolge enthält.
 
 Nachdem das Plugin auf die geöffnete Bildfolge angewandt wurde, wird in der Konsole die Bewegungsrichtung, sowie die Geschwindigkeit des Objekts in jedem Bild ausgegeben.
 
 Für jedes Bild wird zudem ein Overlay erstellt, das die Änderung der Bewegung im Vergleich zum vorherigen Bild in Form von Pfeilen darstellt. Abbildung \ref{img:bsp2} zeigt ein beispielhaftes Overlay. Dort wird die Bewegung des Objekts von Abbildung \ref{img:bsp1} zu Abbildung \ref{img:bsp2} dargestellt.
 
 %TODO Beispielhaftes Overlay einbinden
-\begin{figure}[h]
+\begin{figure}[p]
 	%\hskip-1.0cm
 	\centering
 	\includegraphics[scale=0.5]{./Abbildungen/bsp1.jpg}
@@ -32,13 +40,40 @@ Für jedes Bild wird zudem ein Overlay erstellt, das die Änderung der Bewegung 
 	\label{img:bsp1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[p]
 	%\hskip-1.0cm
 	\centering
 	\includegraphics[scale=0.5]{./Abbildungen/bsp2.jpg}
 	\caption{Bewegung zu Beispiel 1}
 	\label{img:bsp2}
 \end{figure}
+
+
+\section{Aufruf über Kommandozeile}
+
+Damit das Plugin über die Kommandozeile aufgerufen werden kann, muss man es mindestens einmal über \textbf{Compile and Run\dots} ausführen. Daraufhin kann man es über folgenden Befehl aufrufen:
+
+\code{ImageJ -macro /flowig/macro/runplug.ijm Flowig\#path=<dir>,flow=<flowType>}
+
+
+Parameter:
+
+\code{dir} ist der Ordner, der die Bildfolge enthält.
+
+\code{flowType} stellt den Typ der Berechnung des optischen Flusses dar, es können folgenden Typen angegeben werden:
+
+\begin{itemize}
+\item SparseToDense
+\item FarneBack
+\item DeepFlow
+\item DIS
+\item DualTVL1
+\end{itemize}
+
+\code{showx} und \code{showy}
+
+Ist keine grafische Oberfläche erwünscht, so ist \code{-macro} durch \code{-batch} zu ersetzen.
+
 
 \chapter{Bewegungserkennung}
 
@@ -49,4 +84,4 @@ Das Plugin sucht zunächst nach den Bounding-Boxen. Hierzu werden alle magentafa
 
 Daraufhin \dots
 
-\chapter{title}
+\chapter{title}.
