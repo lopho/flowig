@@ -70,6 +70,47 @@ public class Flowig_ implements PlugIn {
         Flowig_ flowig = new Flowig_();
         flowig.run(null);
     }
+ 
+//############################################################################
+// check plugin arguments
+    /**
+     * @return True on correct arguments else false
+     */
+    private boolean checkArguments(String arg) {
+                
+        String options = arg != null && !arg.trim().isEmpty() ? arg : Macro.getOptions();
+                        
+        if(options == null){
+            return false;
+        }
+        
+        String [] arguments = options.split(ARGUMENT_DIVIDER);
+        
+        for (String s : arguments){
+            
+            String[] values = s.split("=");
+            String name = values[0];
+            String value = values[1];
+            
+            switch (name) {
+                case "path": 
+                    dataDir = value
+                            .trim()
+                            .replace("~", System.getenv("HOME"));
+                    break;
+                case "flow": 
+                    flowType = FlowType.valueOf(value.trim());
+                    break;
+            }
+        }
+        
+        IJ.log("dataDir: " + dataDir);
+        IJ.log("exists? " +new File(dataDir).exists());
+        IJ.log("flowType: " + flowType);
+     
+        
+        return true;
+    }
     
 //############################################################################
 // plugin (run)
@@ -122,13 +163,17 @@ public class Flowig_ implements PlugIn {
         vizImg.setOverlay(o);
         vizImg.show();
         
+        ImagePlus flowImg = new ImagePlus("flowShow", flows.get(0).getProcessor());
+        flowImg.show();
+        
         for (int i = 0; i < images.size(); ++i) {
             vizImg.setImage(images.get(i));
             o.remove(imgRoi);
             imgRoi = new ImageRoi(0, 0, flows.get(i).getProcessor());
             imgRoi.setComposite(comp);
             o.add(imgRoi);
-            IJ.wait(1000);
+            flowImg.setImage(flows.get(i));
+            IJ.wait(2000);
         }
     }
     
@@ -285,46 +330,6 @@ public class Flowig_ implements PlugIn {
             vizImg.close();
         
         return imagesOut;
-    }
-
-    /**
-     * 
-     * @return True on correct arguments else false
-     */
-    private boolean checkArguments(String arg) {
-                
-        String options = arg != null && !arg.trim().isEmpty() ? arg : Macro.getOptions();
-                        
-        if(options == null){
-            return false;
-        }
-        
-        String [] arguments = options.split(ARGUMENT_DIVIDER);
-        
-        for (String s : arguments){
-            
-            String[] values = s.split("=");
-            String name = values[0];
-            String value = values[1];
-            
-            switch (name) {
-                case "path": 
-                    dataDir = value
-                            .trim()
-                            .replace("~", System.getenv("HOME"));
-                    break;
-                case "flow": 
-                    flowType = FlowType.valueOf(value.trim());
-                    break;
-            }
-        }
-        
-        IJ.log("dataDir: " + dataDir);
-        IJ.log("exists? " +new File(dataDir).exists());
-        IJ.log("flowType: " + flowType);
-     
-        
-        return true;
     }
     
 // ######## flow type
