@@ -20,6 +20,8 @@ import ij.gui.Roi;
 import ij.gui.TextRoi;
 import ij.gui.Arrow;
 import ij.gui.ImageRoi;
+import ij.gui.Line;
+import ij.gui.OvalRoi;
 import ij.gui.PolygonRoi;
 import ij.io.DirectoryChooser;
 import ij.process.ColorProcessor;
@@ -63,6 +65,9 @@ public class Flowig_ implements PlugIn {
     
     private FlowType flowType = FlowType.DIS;
     private String dataDir;
+    private boolean showX = true;
+    private boolean showY = true;
+    private float maxMotion = 100f;
 
 //############################################################################
 // main (for debugging purposes only)
@@ -76,9 +81,9 @@ public class Flowig_ implements PlugIn {
     /**
      * @return True on correct arguments else false
      */
-    private boolean checkArguments(String arg) {
+    private boolean checkArguments(final String arg) {
                 
-        String options = arg != null && !arg.trim().isEmpty() ? arg : Macro.getOptions();
+        final String options = arg != null && !arg.trim().isEmpty() ? arg : Macro.getOptions();
                         
         if(options == null){
             return false;
@@ -86,29 +91,39 @@ public class Flowig_ implements PlugIn {
         
         String [] arguments = options.split(ARGUMENT_DIVIDER);
         
-        for (String s : arguments){
-            
-            String[] values = s.split("=");
-            String name = values[0];
-            String value = values[1];
+        for (final String s : arguments){
+            final String[] values = s.split("=");
+            final String name = values[0].toLowerCase().trim();
+            final String value = values[1].trim();
             
             switch (name) {
                 case "path": 
-                    dataDir = value
-                            .trim()
-                            .replace("~", System.getenv("HOME"));
+                    dataDir = value.replace("~", System.getenv("HOME"));
                     break;
                 case "flow": 
-                    flowType = FlowType.valueOf(value.trim());
+                    flowType = FlowType.valueOf(value);
+                    break;
+                case "showx":
+                    showX = Boolean.parseBoolean(value);
+                    break;
+                case "showy":
+                    showY = Boolean.parseBoolean(value);
+                    break;
+                case "maxmotion":
+                    maxMotion = Float.parseFloat(value);
+                    break;
+                default:
                     break;
             }
         }
         
         IJ.log("dataDir: " + dataDir);
-        IJ.log("exists? " +new File(dataDir).exists());
+        IJ.log("exists? " + new File(dataDir).exists());
         IJ.log("flowType: " + flowType);
-     
-        
+        IJ.log("showX: " + showX);
+        IJ.log("showY: " + showY);
+        IJ.log("maxMotion: " + maxMotion);
+
         return true;
     }
     
@@ -148,15 +163,20 @@ public class Flowig_ implements PlugIn {
         } 
         
         Overlay o = getBoundsBasedMovement(images, false);
-        ArrayList<ImagePlus> flows = getOpticalFlowBasedMovement(images, false, flowType);
+        ArrayList<ImagePlus> flows = getOpticalFlowBasedMovement(
+                images, false, flowType, maxMotion, showX, showY);
+        
+        final int legendSize = 512;
+        ImagePlus legend = getFlowLegend(legendSize, legendSize, legendSize);
+        legend.show();
         
         final int w = images.get(0).getWidth();
         final int h = images.get(0).getHeight();
-        final Composite comp = BlendComposite.getInstance(BlendComposite.BlendingMode.MULTIPLY);
         
-        ImageRoi imgRoi = new ImageRoi(0, 0, flows.get(0).getProcessor());
-        imgRoi.setComposite(comp);
-        o.add(imgRoi);
+//        final Composite comp = BlendComposite.getInstance(BlendComposite.BlendingMode.MULTIPLY);
+//        ImageRoi imgRoi = new ImageRoi(0, 0, flows.get(0).getProcessor());
+//        imgRoi.setComposite(comp);
+//        o.add(imgRoi);
         
         ImagePlus vizImg = new ImagePlus("flow", images.get(0).getProcessor());
         vizImg.setImage(images.get(0));
@@ -168,13 +188,17 @@ public class Flowig_ implements PlugIn {
         
         for (int i = 0; i < images.size(); ++i) {
             vizImg.setImage(images.get(i));
-            o.remove(imgRoi);
-            imgRoi = new ImageRoi(0, 0, flows.get(i).getProcessor());
-            imgRoi.setComposite(comp);
-            o.add(imgRoi);
+//            o.remove(imgRoi);
+//            imgRoi = new ImageRoi(0, 0, flows.get(i).getProcessor());
+//            imgRoi.setComposite(comp);
+//            o.add(imgRoi);
             flowImg.setImage(flows.get(i));
-            IJ.wait(2000);
+            IJ.wait(1000);
         }
+        
+        flowImg.close();
+        vizImg.close();
+        legend.close();
     }
     
    
@@ -288,14 +312,16 @@ public class Flowig_ implements PlugIn {
 //############################################################################    
 //############################################################################ 
 // ######## compute and vizualize optical flow for all images
-    static public ArrayList<ImagePlus> getOpticalFlowBasedMovement(ArrayList<ImagePlus> images, boolean viz, FlowType flowType) {
+    static public ArrayList<ImagePlus> getOpticalFlowBasedMovement(
+            ArrayList<ImagePlus> images,
+            boolean viz, FlowType flowType,
+            final float maxmotion,
+            boolean doX, boolean doY) {
         ArrayList<ImagePlus> imagesOut = new ArrayList<>();
         
         if (images.size() < 2)
             return imagesOut;
-        
-        
-        
+
         ImagePlus img0 = images.get(0);
         final int w = img0.getWidth();
         final int h = img0.getHeight();
@@ -314,7 +340,7 @@ public class Flowig_ implements PlugIn {
                 opencv_imgproc.pyrDown(mat1, mat1);
             }
             Mat flow = makeFlow(mat0, mat1, flowType);
-            Mat flowImg = drawOpticalFlow(flow);
+            Mat flowImg = drawOpticalFlow(flow, maxmotion, doX, doY);
             for (int i = 0; i < SCALE_SIZE; ++i) {
                 opencv_imgproc.pyrUp(flowImg, flowImg);
             }
@@ -411,7 +437,13 @@ public class Flowig_ implements PlugIn {
     }
     
 // ######## visualize flow vector as color
-    static public Color computeColor(final float fx, final float fy) {
+    static public Color computeColor(float fx, float fy) {
+        return computeColor(fx, fy, true, true);
+    }
+    
+    static public Color computeColor(float fx, float fy, boolean doX, boolean doY) {
+        if (!doX) fx = 0;
+        if (!doY) fy = 0;
         final float rad = (float) (Math.sqrt(fx * fx + fy * fy));
         final float a = (float) (Math.atan2(-fy, -fx) / Math.PI);
         return computeColorRad(rad, a);
@@ -442,11 +474,59 @@ public class Flowig_ implements PlugIn {
         return pix;
     }
     
+        
+// ######## draw flow vector legend
+    static public ImagePlus getFlowLegend(final int w, final int h, final float maxmotion) {
+        ImagePlus legend = toImagePlus(drawFlowLegend(w, h, maxmotion), "legend");
+        Overlay o = new Overlay();
+        legend.setOverlay(o);
+        OvalRoi circleRoi = new OvalRoi(0, 0, w, h);
+        circleRoi.setStrokeColor(java.awt.Color.black);
+        o.add(circleRoi);
+        Line xAxis = new Line(0, h/2, w, h/2);
+        xAxis.setStrokeColor(java.awt.Color.black);
+        o.add(xAxis);
+        Line yAxis = new Line(w/2, 0, w/2, h);
+        yAxis.setStrokeColor(java.awt.Color.black);
+        o.add(yAxis);
+        final int ticks = 10;
+        final float tickStepX = w / (float)ticks;
+        final float tickStepY = h / (float)ticks;
+        for (int i = 0; ticks > i; ++i) {
+            Line tickX = new Line(tickStepX*i, h/2-5, tickStepX*i, h/2+5);
+            tickX.setStrokeColor(java.awt.Color.black);
+            o.add(tickX);
+            Line tickY = new Line(w/2-5, tickStepY*i, w/2+5, tickStepY*i);
+            tickY.setStrokeColor(java.awt.Color.black);
+            o.add(tickY);
+        }
+        return legend;
+    }
+    
+    static public Mat drawFlowLegend(final int w, final int h, final float maxmotion) {
+        final Vector size = new Vector(w,h);
+        final Vector center = size.divide(2);
+        
+        Mat leg = new Mat(h, w, opencv_core.CV_8UC3);
+        UByteRawIndexer idxOut = leg.createIndexer(true);
+        for (int x = 0; size.x > x; ++x) {
+            for (int y = 0; size.y > y; ++y) {
+                final Vector pos = (new Vector(x,y)).minus(center);
+                final Color color = computeColor((float)(pos.x/maxmotion), (float)(pos.y/maxmotion));
+                idxOut.put(y, x * 3, color.r*SCALE_COLOR);
+                idxOut.put(y, x * 3 + 1, color.g*SCALE_COLOR);
+                idxOut.put(y, x * 3 + 2, color.b*SCALE_COLOR);
+            }
+        }
+        
+        return leg;
+    }
+    
 // ######## visualize entire flow field with colors
     static public Mat drawOpticalFlow(final Mat flow) {
-        return drawOpticalFlow(flow, -1);
+        return drawOpticalFlow(flow, -1, true, true);
     }
-    static public Mat drawOpticalFlow(final Mat flow, final float maxmotion) {
+    static public Mat drawOpticalFlow(final Mat flow, final float maxmotion, boolean doX, boolean doY) {
 //        ImageProcessor ip = new ColorProcessor(flow.cols(), flow.rows());
 //        ImagePlus imp = new ImagePlus("flow", ip);
         Mat dst = new Mat(flow.size(), opencv_core.CV_8UC3);
@@ -469,6 +549,8 @@ public class Flowig_ implements PlugIn {
                 }
             }
         }
+        
+        System.out.println(maxrad);
 
         UByteRawIndexer idxOut = dst.createIndexer(true);
         for (int y = 0; y < flow.rows(); ++y) {
@@ -479,7 +561,7 @@ public class Flowig_ implements PlugIn {
                 if (!isFlowCorrect(ux, uy)) {
                     continue;
                 }
-                final Color c = computeColor(ux / maxrad, uy / maxrad);
+                final Color c = computeColor(ux / maxrad, uy / maxrad, doX, doY);
 //                ip.set(x, y, (c.r * m) << 16 | (c.g * m) << 8 | (c.b * m));
                 idxOut.put(y, x * 3, c.r*SCALE_COLOR);
                 idxOut.put(y, x * 3 + 1, c.g*SCALE_COLOR);
