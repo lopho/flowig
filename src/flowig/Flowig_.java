@@ -19,7 +19,6 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
 import ij.gui.Arrow;
-import ij.gui.ImageRoi;
 import ij.gui.Line;
 import ij.gui.OvalRoi;
 import ij.gui.PolygonRoi;
@@ -178,7 +177,7 @@ public class Flowig_ implements PlugIn {
                 images, false, flowType, maxMotion, showX, showY);
         
         final int legendSize = 512;
-        ImagePlus legend = getFlowLegend(legendSize, legendSize, legendSize);
+        ImagePlus legend = getFlowLegend(legendSize, legendSize, legendSize, showX, showY);
         legend.show();
         
         final int w = images.get(0).getWidth();
@@ -487,8 +486,8 @@ public class Flowig_ implements PlugIn {
     
         
 // ######## draw flow vector legend
-    public ImagePlus getFlowLegend(final int w, final int h, final float maxmotion) {
-        ImagePlus legend = toImagePlus(drawFlowLegend(w, h, maxmotion), "legend");
+    public ImagePlus getFlowLegend(final int w, final int h, final float maxmotion, boolean doX, boolean doY) {
+        ImagePlus legend = toImagePlus(drawFlowLegend(w, h, maxmotion, doX, doY), "legend");
         Overlay o = new Overlay();
         legend.setOverlay(o);
         OvalRoi circleRoi = new OvalRoi(0, 0, w, h);
@@ -514,7 +513,7 @@ public class Flowig_ implements PlugIn {
         return legend;
     }
     
-    public Mat drawFlowLegend(final int w, final int h, final float maxmotion) {
+    public Mat drawFlowLegend(final int w, final int h, final float maxmotion, boolean doX, boolean doY) {
         final Vector size = new Vector(w,h);
         final Vector center = size.divide(2);
         
@@ -523,7 +522,7 @@ public class Flowig_ implements PlugIn {
         for (int x = 0; size.x > x; ++x) {
             for (int y = 0; size.y > y; ++y) {
                 final Vector pos = (new Vector(x,y)).minus(center);
-                final Color color = computeColor((float)(pos.x/maxmotion), (float)(pos.y/maxmotion));
+                final Color color = computeColor((float)(pos.x/maxmotion), (float)(pos.y/maxmotion), doX, doY);
                 idxOut.put(y, x * 3, color.r*scaleColor);
                 idxOut.put(y, x * 3 + 1, color.g*scaleColor);
                 idxOut.put(y, x * 3 + 2, color.b*scaleColor);
@@ -560,8 +559,6 @@ public class Flowig_ implements PlugIn {
                 }
             }
         }
-        
-        System.out.println(maxrad);
 
         UByteRawIndexer idxOut = dst.createIndexer(true);
         for (int y = 0; y < flow.rows(); ++y) {
