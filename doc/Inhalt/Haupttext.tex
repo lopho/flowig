@@ -1,9 +1,9 @@
 %http://www.imn.htwk-leipzig.de/~schwarz/lehre/ss17/dbv/projekte-ss17.pdf
 
 \chapter{Programmfunktion}\label{sec:Einleitung}
-Das vorliegende ImageJ-Plugin Flowig dient zur Erkennung der Bewegung eines markierten Objektes in Bildfolgen. Es wird für jedes Bild die Bewegung des Objekts im Vergleich zum vorherigen Bild erkannt.
+Das vorliegende ImageJ-Plugin Flowig dient zur Erkennung der Bewegung eines markierten Objektes in Bildfolgen. Es wird für jedes Bild die Bewegung des Objekts im Vergleich zum vorherigen Bild erkannt. Zudem wird der optische Fluss berechnet.
 
-\textbf{Eingabe: } Ein Ordner, in dem sich eine Bildfolge befindet. Ist ein Objekt in einem Bild vorhanden, muss dieses durch magentafarbene~(RGB-Wert:~255,~255,~0)\\Bounding-Boxen markiert sein.
+\textbf{Eingabe: } Ein Ordner, in dem sich eine Bildfolge befindet. Ist ein Objekt in einem Bild vorhanden, muss dieses durch Bounding-Boxen markiert sein.
 
 
 \textbf{Ausgabe: } Bewegungsrichtung und Geschwindigkeit des Objekts in jedem Bild
@@ -23,44 +23,58 @@ Die aktuelle Version lässt sich in ImageJ über folgendes Menü einsehen:\\
 
 \section{Nutzung}
 
-In ImageJ muss über das Menü~\textbf{File}~$\rightarrow$~\textbf{Import}~$\rightarrow$~\textbf{Image Sequence$\dots$} eine Bildfolge geöffnet werden. 
-
 Nachdem das Plugin gestartet wurde, muss ein Ordner gewählt werden, der eine Bildfolge enthält.
 
 Nachdem das Plugin auf die geöffnete Bildfolge angewandt wurde, wird in der Konsole die Bewegungsrichtung, sowie die Geschwindigkeit des Objekts in jedem Bild ausgegeben.
 
-Für jedes Bild wird zudem ein Overlay erstellt, das die Änderung der Bewegung im Vergleich zum vorherigen Bild in Form von Pfeilen darstellt. Abbildung \ref{img:bsp2} zeigt ein beispielhaftes Overlay. Dort wird die Bewegung des Objekts von Abbildung \ref{img:bsp1} zu Abbildung \ref{img:bsp2} dargestellt.
+Für jedes Bild wird zudem ein Overlay erstellt, das die Änderung der Position im Vergleich zum vorherigen Bild in Form von Pfeilen darstellt. Abbildung \ref{img:bsp2} zeigt ein beispielhaftes Overlay. Dort wird die Bewegung des Objekts von Abbildung \ref{img:bsp1} zu Abbildung \ref{img:bsp2} dargestellt.
+ 
+Der beispielhafte optische Fluss zu Bild \ref{img:bsp2} wird in Abbildung \ref{img:bsp3} dargestellt. Jeder Pixel bekommt einen Farbwert zugewiesen. Das Zuweisen geschieht über die Auswahl einer Farbe in einem Farbrad. Die Richtung des Vektors des Pixels im optischen Fluss bestimmt den Farbton, der Betrag des Vektors bestimmt die Sättigung. Es wird zudem eine Legende angezeigt, ein beispielhaftes Farbrad wird in Bild \ref{img:bsp4} gezeigt.
 
-%TODO Beispielhaftes Overlay einbinden
 \begin{figure}[p]
 	%\hskip-1.0cm
 	\centering
 	\includegraphics[scale=0.5]{./Abbildungen/bsp1.jpg}
-	\caption{Beispiel 1}
+	\caption{Ein Eingabebild ohne Overlay}
 	\label{img:bsp1}
 \end{figure}
 
 \begin{figure}[p]
 	%\hskip-1.0cm
 	\centering
-	\includegraphics[scale=0.5]{./Abbildungen/bsp2.jpg}
+	\includegraphics[scale=0.5]{./Abbildungen/4.png}
 	\caption{Bewegung zu Beispiel 1}
 	\label{img:bsp2}
 \end{figure}
 
+\begin{figure}[p]
+	%\hskip-1.0cm
+	\centering
+	\includegraphics[scale=0.5]{./Abbildungen/5.png}
+	\caption{Optischer Fluss zu \ref{img:bsp2}}
+	\label{img:bsp3}
+\end{figure}
+
+\begin{figure}[p]
+	%\hskip-1.0cm
+	\centering
+	\includegraphics[scale=0.5]{./Abbildungen/6.png}
+	\caption{Beispielhaftes Farbrad}
+	\label{img:bsp4}
+\end{figure}
 
 \section{Aufruf über Kommandozeile}
 
 Damit das Plugin über die Kommandozeile aufgerufen werden kann, muss man es mindestens einmal über \textbf{Compile and Run\dots} ausführen. Daraufhin kann man es über folgenden Befehl aufrufen:
 
-\code{ImageJ -macro /flowig/macro/runplug.ijm Flowig\#path=<dir>,flow=<flowType>}
+\code{ImageJ -macro /flowig/macro/runplug.ijm Flowig\#parameter=<wert>,\dots}
 
 
-Parameter:
+Mögliche Parameter:
 
-\code{dir} ist der Ordner, der die Bildfolge enthält.
+\code{path=dir} ist der Ordner, der die Bildfolge enthält.
 
-\code{flowType} stellt den Typ der Berechnung des optischen Flusses dar, es können folgenden Typen angegeben werden:
+\code{flow=flowType} stellt den zu nutzenden Algorithmus zur Berechnung des optischen Flusses dar, es können folgenden Typen angegeben werden:
 
 \begin{itemize}
 \item SparseToDense
@@ -70,18 +84,17 @@ Parameter:
 \item DualTVL1
 \end{itemize}
 
-\code{showx} und \code{showy}
+Standardwert: DIS 
+
+\code{showx=true|false} und \code{showy=true|false} schalten die Darstellung der $x$ beziehungsweise $y$ Komponenten des optischen Flusses ein und aus, Standardwerte: true
+
+\code{boundscolor} ist die Farbe der Bounding-Boxen im Format: <r>+<g>+<b>, Standardwert: 255+255+0
+
+\code{maxmotion} der Maximalwert der Farbintensitätsskalierung, Standardwert: 100
+
+\code{scalesize} gibt an, wie oft das Bild herunterskaliert wird für die Flussberechnung, Standardwert: 0
+
+\code{scalecolor} gibt den Sättigungsmultiplikator an, Standardwert: 1
+
 
 Ist keine grafische Oberfläche erwünscht, so ist \code{-macro} durch \code{-batch} zu ersetzen.
-
-
-\chapter{Bewegungserkennung}
-
-%TODO Verfahren erläutern
-In diesem Kapitel soll das genutzte Verfahren zur Erkennung von Bewegungen in Bildfolgen erläutert werden.
-
-Das Plugin sucht zunächst nach den Bounding-Boxen. Hierzu werden alle magentafarbene Punkte der Bilder zu Bounding-Boxen zusammengefasst.
-
-Daraufhin \dots
-
-\chapter{title}.
