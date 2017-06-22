@@ -25,7 +25,7 @@ Die aktuelle Version lässt sich in ImageJ über folgendes Menü einsehen:\\
 
 Nachdem das Plugin gestartet wurde, muss ein Ordner gewählt werden, der eine Bildfolge enthält.
 
-Nachdem das Plugin auf die geöffnete Bildfolge angewandt wurde, wird in der Konsole die Bewegungsrichtung, sowie die Geschwindigkeit des Objekts in jedem Bild ausgegeben.
+Nach Anwenden des Plugins auf die geöffnete Bildfolge, wird in der Konsole die Bewegungsrichtung, sowie die Geschwindigkeit des Objekts in jedem Bild ausgegeben.
 
 Für jedes Bild wird zudem ein Overlay erstellt, das die Änderung der Position im Vergleich zum vorherigen Bild in Form von Pfeilen darstellt. Abbildung \ref{img:bsp2} zeigt ein beispielhaftes Overlay. Dort wird die Bewegung des Objekts von Abbildung \ref{img:bsp1} zu Abbildung \ref{img:bsp2} dargestellt.
  
@@ -73,6 +73,7 @@ Damit das Plugin über die Kommandozeile aufgerufen werden kann, muss man es min
 Mögliche Parameter:
 
 \code{path=dir} ist der Ordner, der die Bildfolge enthält.
+ \\
 
 \code{flow=flowType} stellt den zu nutzenden Algorithmus zur Berechnung des optischen Flusses dar, es können folgenden Typen angegeben werden:
 
@@ -97,4 +98,4 @@ Standardwert: DIS
 \code{scalecolor} gibt den Sättigungsmultiplikator an, Standardwert: 1
 
 
-Ist keine grafische Oberfläche erwünscht, so ist \code{-macro} durch \code{-batch} zu ersetzen.
+Ist während der Ausführung keine grafische Oberfläche erwünscht, so ist \code{-macro} durch \code{-batch} zu ersetzen.
