@@ -200,19 +200,22 @@ public class Flowig_ implements PlugIn {
         ImagePlus flowImg = new ImagePlus("flowShow", flows.get(0).getProcessor());
         flowImg.show();
         
-        for (int i = 0; i < images.size(); ++i) {
-            vizImg.setImage(images.get(i));
+        while(true){
+			for (int i = 0; i < images.size(); ++i) {
+				vizImg.setImage(images.get(i));
 //            o.remove(imgRoi);
 //            imgRoi = new ImageRoi(0, 0, flows.get(i).getProcessor());
 //            imgRoi.setComposite(comp);
 //            o.add(imgRoi);
-            flowImg.setImage(flows.get(i));
-            IJ.wait(1000);
-        }
+				flowImg.setImage(flows.get(i));
+				IJ.wait(500);
+			}
+		}
+
         
-        flowImg.close();
-        vizImg.close();
-        legend.close();
+        //flowImg.close();
+        //vizImg.close();
+        //legend.close();
     }
     
    
