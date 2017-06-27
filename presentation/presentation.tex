@@ -129,35 +129,37 @@
 
 \end{frame}
 
-\section{Aufruf über Kommandozeile}
-\begin{frame}{\secname}
-
-\code{ImageJ -macro /flowig/macro/runplug.ijm Flowig\#parameter=<wert>,\dots}
-
-\begin{itemize}
-\item \code{path} Pfad zur Bildfolge
-\item \code{flow} Algorithmus zur Flussberechnung
-  \item \code{showx} und \code{showy} Visualisierung x bzw. y Komponenten
-
-\item\code{boundscolor}: Farbe der Bounding-Boxen
-
-\item\code{maxmotion}: Maximalwert der Farbintensitätsskalierung
-
-\item\code{scalesize}: Anzahl Skalierungen
-
-\item\code{scalecolor}: Sättigungsmultiplikator
-\end{itemize}
-
-\end{frame}
-
 \section{Ausblick}
 \begin{frame}{\secname}
 \begin{itemize}
-	\item Entfernen der Ego-Bewegung
+	\item Herausrechnen der Ego-Bewegung
 	\item Clustern anhand ähnlicher Bewegungsvektoren
 	\item um Objekte ohne Bounding-Boxen zu finden
 \end{itemize}
 \end{frame}
+
+\section{Aufruf über Kommandozeile}
+\begin{frame}{\secname}
+	
+	\code{ImageJ -macro /flowig/macro/runplug.ijm Flowig\#parameter=<wert>,\dots}
+	
+	\begin{itemize}
+		\item \code{Flowig} Name des Plugins
+		\item \code{path} Pfad zur Bildfolge
+		\item \code{flow} Algorithmus zur Flussberechnung
+		\item \code{showx} und \code{showy} Darstellung von x bzw. y Komponenten
+		
+		\item\code{boundscolor}: Farbe der Bounding-Boxen
+		
+		\item\code{maxmotion}: Maximalwert der Farbintensitätsskalierung
+		
+		\item\code{scalesize}: Anzahl von Bildskalierungen (Subsampling)
+		
+		\item\code{scalecolor}: Sättigungsmultiplikator
+	\end{itemize}
+	
+\end{frame}
+
 
 %\section{Zusammenfassung}
 %\label{sec_zsf}
